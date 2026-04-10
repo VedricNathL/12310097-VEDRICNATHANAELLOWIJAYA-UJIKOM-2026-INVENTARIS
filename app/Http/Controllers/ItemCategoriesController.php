@@ -10,12 +10,12 @@ class ItemCategoriesController extends Controller
     public function index()
     {
         $categories = ItemCategories::withCount('stocks')->get();
-        return view('categories.index', compact('categories'));
+        return view('/category', compact('categories'));
     }
 
     public function create()
     {
-        return view('categories.create');
+        return view('category.create');
     }
 
     public function store(Request $request)
@@ -33,7 +33,7 @@ class ItemCategoriesController extends Controller
     public function edit($id)
     {
         $category = ItemCategories::findOrFail($id);
-        return view('categories.edit', compact('category'));
+        return view('category.edit', compact('category'));
     }
 
     public function update(Request $request, $id)

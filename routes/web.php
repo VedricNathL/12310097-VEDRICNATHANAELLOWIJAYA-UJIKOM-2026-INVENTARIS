@@ -3,6 +3,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ItemCategoriesController;
+use App\Http\Controllers\ItemStocksController;
+
 Route::get('/', function () {
     return view('/welcome');
 });
@@ -49,10 +51,12 @@ Route::post('/logout', function (Request $request) {
     return redirect('/login');
 })->name('logout');
 
-Route::get('/category', function () {
-    return view('/category');
+Route::middleware('auth')->group(function () {
+    Route::resource('/category', ItemCategoriesController::class)->except(['create', 'edit', 'show']);
 });
 
 Route::middleware('auth')->group(function () {
-    Route::resource('/category', ItemCategoriesController::class);
+    Route::resource('/item', ItemStocksController::class)->except(['create', 'edit', 'show']);
 });
+
+Route::get('/item/export', [ItemStocksController::class, 'export'])->name('item.export');

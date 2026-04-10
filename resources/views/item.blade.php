@@ -11304,52 +11304,20 @@ body.sidebar-toggled footer.sticky-footer {
 <body id="page-top">
 
 <div id="wrapper">
-
     <!-- SIDEBAR -->
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
             <div class="sidebar-brand-text mx-3">Inventaris</div>
         </a>
-
         <hr class="sidebar-divider my-0">
-
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('/dashboard') }}">
-                <span>Dashboard</span>
-            </a>
-        </li>
-
+        <li class="nav-item"><a class="nav-link" href="{{ url('/dashboard') }}"><span>Dashboard</span></a></li>
         <hr class="sidebar-divider">
-
         <div class="sidebar-heading">Interface</div>
-
-        <li class="nav-item">
-            <a class="nav-link active" href="{{ url('/user') }}">
-                <span>Users</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <span>Lendings</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link active" href="{{ url('/category') }}">
-                <span>Category</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('/item') }}">
-                <span>Item</span>
-            </a>
-        </li>
-
+        <li class="nav-item"><a class="nav-link" href="#"><span>Users</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><span>Lendings</span></a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ url('/category') }}"><span>Category</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url('/item') }}"><span>Item</span></a></li>
         <hr class="sidebar-divider d-none d-md-block">
-
         <li class="nav-item">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -11358,140 +11326,166 @@ body.sidebar-toggled footer.sticky-footer {
                 </button>
             </form>
         </li>
-
     </ul>
 
     <!-- CONTENT -->
     <div id="content-wrapper" class="d-flex flex-column w-100">
-
         <div id="content">
-
-            <!-- TOPBAR -->
             <nav class="navbar navbar-light bg-white shadow mb-4 px-3"></nav>
 
-            <!-- MAIN CONTENT -->
             <div class="container-fluid">
-
-                <h3>Data Category</h3>
+                <h3>Data Item</h3>
 
                 <!-- BUTTON CREATE -->
-                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModal">
-                    + Tambah
-                </button>
-
+                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModal">+ Tambah</button>
+                <a href="{{ route('item.export') }}" class="btn btn-success mb-3">Export to Excel</a>
                 <!-- TABLE -->
                 <table class="table table-bordered">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Nama</th>
-                            <th>Divisi</th>
-                            <th>Jumlah Item</th>
+                            <th>Category</th>
+                            <th>Name</th>
+                            <th>Total</th>
+                            <th>Repair</th>
+                            <th>Lending</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        @foreach($categories as $c)
+                      @foreach($items as $item)
                         <tr>
-                            <td>{{ $c->id }}</td>
-                            <td>{{ $c->name }}</td>
-                            <td>{{ $c->division }}</td>
-                            <td>{{ $c->stocks_count }}</td>
+                            <td>{{ $item->id }}</td>
+                            <td>{{ $item->category->name ?? '-' }}</td>
+                            <td>{{ $item->item_name }}</td>
+                            <td>{{ $item->total_stock }}</td>
+                            <td>{{ $item->total_repaired }}</td>
+                            <td>{{ $item->total_borrowed }}</td>
                             <td>
-
-                                <!-- EDIT BUTTON -->
-                                <button class="btn btn-warning btn-sm"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editModal{{ $c->id }}">
-                                    Edit
-                                </button>
-
-                                <!-- DELETE -->
-                                <form action="{{ route('category.destroy', $c->id) }}" method="POST" style="display:inline;">
+                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ $item->id }}">Edit</button>
+                                <form action="{{ route('item.destroy',$item->id) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-danger btn-sm">
-                                        Hapus
-                                    </button>
+                                    <button class="btn btn-danger btn-sm">Hapus</button>
                                 </form>
-
                             </td>
                         </tr>
 
                         <!-- EDIT MODAL -->
-                        <div class="modal fade" id="editModal{{ $c->id }}">
+                        <div class="modal fade" id="editModal{{ $item->id }}">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-
                                     <div class="modal-header">
-                                        <h5>Edit Category</h5>
+                                        <h5>Edit Item</h5>
                                     </div>
 
-                                    <form action="{{ route('category.update', $c->id) }}" method="POST">
+                                    <form action="{{ route('item.update', $item->id) }}" method="POST">
                                         @csrf
                                         @method('PUT')
-
                                         <div class="modal-body">
-                                            <span class="text-gray-600 small">Nama</span>
-                                            <input type="text" name="name" value="{{ $c->name }}" class="form-control mb-2 required">
-                                            <span class="text-gray-600 small">Divisi</span>
-                                            <input type="text" name="division" value="{{ $c->division }}" class="form-control required">
+                                            <span class="text-gray-600 small">Nama Item</span>
+                                            <input type="text" name="item_name" value="{{ $item->item_name }}" class="form-control mb-2" required>
+
+                                            <span class="text-gray-600 small">Category</span>
+                                            <select name="category_id" class="form-control mb-2" required>
+                                                @foreach($categories as $category)
+                                                    <option value="{{ $category->id }}" {{ $item->category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                                @endforeach
+                                            </select>
+
+                                            <span class="text-gray-600 small">Total</span>
+                                            <input type="number" name="total_stock" value="{{ $item->total_stock }}" class="form-control mb-2" required>
+
+                                            <label class="text-gray-600 small">
+                                                New Broken Item
+                                                <span id="current-broken-{{ $item->id }}">
+                                                    currently: {{ $newBrokenItems[$item->id] ?? 0 }}
+                                                </span>
+                                            </label>
+                                            <input type="number" class="form-control mb-2"
+                                                   oninput="storeBroken({{ $item->id }}, this.value)"
+                                                   value="{{ $newBrokenItems[$item->id] ?? 0 }}">
                                         </div>
 
                                         <div class="modal-footer">
-                                            <button class="btn btn-primary">Update</button>
+                                            <button type="submit" class="btn btn-primary">Update</button>
                                         </div>
-
                                     </form>
-
                                 </div>
                             </div>
                         </div>
-
-                        @endforeach
+                      @endforeach
                     </tbody>
                 </table>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 <!-- CREATE MODAL -->
 <div class="modal fade" id="createModal">
     <div class="modal-dialog">
         <div class="modal-content">
-
             <div class="modal-header">
-                <h5>Tambah Category</h5>
+                <h5>Tambah Item</h5>
             </div>
 
-            <form action="{{ route('category.store') }}" method="POST">
+            <form action="{{ route('item.store') }}" method="POST">
                 @csrf
-
                 <div class="modal-body">
-                    <span class="text-gray-600 small">Nama</span>
-                    <input type="text" name="name" class="form-control mb-2" placeholder="Nama" required>
-                    <span class="text-gray-600 small">Divisi</span>
-                    <input type="text" name="division" class="form-control" placeholder="Divisi" required>
+                    <span class="text-gray-600 small">Nama Item</span>
+                    <input type="text" name="item_name" class="form-control mb-2" required>
+
+                    <span class="text-gray-600 small">Category</span>
+                    <select name="category_id" class="form-control mb-2" required>
+                        <option value="">-- Pilih Category --</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+
+                    <span class="text-gray-600 small">Total</span>
+                    <input type="number" name="total_stock" class="form-control mb-2" required>
+
+                    <label class="text-gray-600 small">
+                        New Broken Item <span id="current-broken-new">currently: 0</span>
+                    </label>
+                    <input type="number" class="form-control mb-2"
+                           name="new_broken_item"
+                           oninput="storeBroken('new', this.value)">
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-success">Simpan</button>
+                    <button type="submit" class="btn btn-success">Simpan</button>
                 </div>
-
             </form>
-
         </div>
     </div>
 </div>
 
-<!-- BOOTSTRAP JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+let brokenItems = {};
+
+function storeBroken(id, value){
+    brokenItems[id] = Number(value) || 0;
+    const span = document.getElementById(`current-broken-${id}`) || document.getElementById('current-broken-new');
+    if(span) span.textContent = `currently: ${brokenItems[id]}`;
+}
+
+// Restore value di Add modal dari brokenItems sementara
+const createModal = document.getElementById('createModal');
+createModal.addEventListener('show.bs.modal', function () {
+    const input = createModal.querySelector('input[name="new_broken_item"]');
+    if(input){
+        input.value = brokenItems['new'] || 0;
+        const span = document.getElementById('current-broken-new');
+        if(span) span.textContent = `currently: ${brokenItems['new'] || 0}`;
+    }
+});
+</script>
 
 </body>
 
